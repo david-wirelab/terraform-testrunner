@@ -1,0 +1,16 @@
+kind: pipeline
+name: terraform-testrunner
+
+steps:
+- name: build and publish
+  image: plugins/docker
+  dockerfile: Dockerfile
+  settings:
+    repo: wirelab/terraform-testrunner
+    username:
+      from_secret: DOCKERHUB_USERNAME
+    password:
+      from_secret: DOCKERHUB_TOKEN
+    tags:
+      - ${DRONE_COMMIT_SHA}
+      - ${DRONE_BUILD_NUMBER}

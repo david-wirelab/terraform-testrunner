@@ -1,0 +1,6 @@
+Dockerfile
+examples
+*.MD
+LICENSE
+Jenkinsfile
+.terraform
