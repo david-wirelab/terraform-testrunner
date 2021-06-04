@@ -134,7 +134,7 @@ class TestGetValue(unittest.TestCase):
     def setUp(self):
         self.snippet = {
             "format_version": "0.1",
-            "terraform_version": "0.12.25",
+            "terraform_version": "0.15.4",
             "planned_values": {},
             "resource_changes": [{
                 "address": "module.rds_alarms.aws_cloudwatch_log_group.lambda_log_group_slack",
@@ -222,6 +222,10 @@ if __name__ == '__main__':
 ```
 
 ## Acknowledgements
+
+*UPDATE TF15*
+
+Update to Terraform v15 required some changes how the local path is constructed in Python.
 
 *UPDATE TF13*
 
