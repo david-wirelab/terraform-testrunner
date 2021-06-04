@@ -36,7 +36,7 @@ class TestGetValue(unittest.TestCase):
     def setUp(self):
         self.snippet = {
             "format_version": "0.1",
-            "terraform_version": "0.13.4",
+            "terraform_version": "0.15.4",
             "planned_values": {},
             "resource_changes": [{
                 "address": "module.rds_alarms.aws_cloudwatch_log_group.lambda_log_group_slack",

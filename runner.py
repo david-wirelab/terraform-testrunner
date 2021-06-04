@@ -9,7 +9,6 @@ import tempfile
 import glob
 from tf_assertion_helper import finder, get_value
 
-
 class Runner(object):
     """Terraform converter, converting .tf files into JSON and Python"""
 
@@ -24,7 +23,7 @@ class Runner(object):
         self.tmpdir = tempfile.mkdtemp()
 
     def _terraform_init(self):
-        subprocess.call(["terraform", "init", self.tmpdir])
+        subprocess.call(['terraform', '-chdir=' + self.tmpdir, 'init'])
 
     def _write_test_tf(self):
         tmp_mytf_file = open("%s/mytf.tf" % (self.tmpdir), "w")
@@ -32,7 +31,7 @@ class Runner(object):
         tmp_mytf_file.close()
 
     def _teraform_plan(self):
-        os.system("terraform plan -input=false -out=%s/mytf.tfplan %s" % (self.tmpdir, self.tmpdir))
+        os.system("terraform -chdir=%s plan -input=false -out=%s/mytf.tfplan" % (self.tmpdir, self.tmpdir))
 
     def _copy_tf_files(self):
         os.system("rm -rf .terraform/modules")
@@ -54,8 +53,11 @@ class Runner(object):
         self.result = result
         self._removetmpdir()
 
+    # def snippet_to_json(self):
+    #     return subprocess.check_output(["terraform", "-chdir=%s/mymodule", "show", "-no-color", "-json", "%s/mytf.tfplan" % (self.tmpdir, self.tmpdir)])
+
     def snippet_to_json(self):
-        return subprocess.check_output(["terraform", "show", "-no-color", "-json", "%s/mytf.tfplan" % (self.tmpdir)])
+        return subprocess.check_output(['terraform', '-chdir=' + self.tmpdir, 'show', '-no-color', '-json', self.tmpdir + '/mytf.tfplan'])
 
     def get_value(self, match_address, match_value):
         return get_value(self.result, match_address, match_value)

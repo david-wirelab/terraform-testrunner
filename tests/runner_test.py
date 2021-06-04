@@ -3,7 +3,6 @@ import unittest
 from unittest import mock
 from runner import Runner
 
-
 class TestRunnerMethods(unittest.TestCase):
     def setUp(self):
         self.snippet = "string"
@@ -28,13 +27,13 @@ class TestRunnerMethods(unittest.TestCase):
     @mock.patch("subprocess.call")
     def test__terraform_init(self, subprocess_mock):
         Runner._terraform_init(self)
-        subprocess_mock.assert_called_once_with(["terraform", "init", self.tmpdir])
+        subprocess_mock.assert_called_once_with(['terraform', '-chdir=' + self.tmpdir, 'init'])
 
     @mock.patch("os.system")
     def test_teraform_plan(self, os_mock):
         Runner._teraform_plan(self)
         os_mock.assert_called_once_with(
-            "terraform plan -input=false -out=" + self.tmpdir + "/mytf.tfplan " + self.tmpdir)
+            "terraform -chdir=%s plan -input=false -out=%s/mytf.tfplan" % (self.tmpdir, self.tmpdir))
 
     @unittest.skip  # @TODO
     @mock.patch("os.system")
@@ -43,11 +42,18 @@ class TestRunnerMethods(unittest.TestCase):
         os_mock.assert_any_call("rm -rf .terraform/modules")
         os_mock.assert_any_call("mkdir " + self.tmpdir + "/mymodule")
 
+    # @mock.patch("subprocess.check_output")
+    # def test_snippet_to_json(self, subprocess_mock):
+    #     Runner.snippet_to_json(self)
+    #     subprocess_mock.assert_called_once_with(
+    #         ['terraform', '-chdir=' + self.tmpdir + '/mymodule'', 'show', '-no-color', '-json', self.tmpdir + '/mytf.tfplan'])
+
     @mock.patch("subprocess.check_output")
     def test_snippet_to_json(self, subprocess_mock):
         Runner.snippet_to_json(self)
         subprocess_mock.assert_called_once_with(
-            ['terraform', 'show', '-no-color', '-json', self.tmpdir + '/mytf.tfplan'])
+            ['terraform', '-chdir=' + self.tmpdir, 'show', '-no-color', '-json', self.tmpdir + '/mytf.tfplan'])
+
 
     @mock.patch("json.loads")
     def test_json_to_dict(self, mock_json):
@@ -69,6 +75,16 @@ class TestE2E(unittest.TestCase):
             skip_requesting_account_id = true
         }
 
+        terraform {
+          required_version = ">= 0.15"
+          required_providers {
+            aws = {
+              source  = "hashicorp/aws"
+              version = "~> 3.43.0"
+            }
+          }
+        }
+
         resource "aws_instance" "foo" {
           ami           = "foo"
           instance_type = "t2.micro"
@@ -79,7 +95,7 @@ class TestE2E(unittest.TestCase):
 
     def test_terraform_version(self):
         print(self.result)
-        self.assertEqual(self.result["terraform_version"], "0.13.4")
+        self.assertEqual(self.result["terraform_version"], "0.15.4")
 
     def test_create_action(self):
         self.assertEqual(self.result["resource_changes"][0]["change"]["actions"], ['create'])
@@ -102,6 +118,16 @@ class TestE2EModule(unittest.TestCase):
             skip_credentials_validation = true
             skip_get_ec2_platforms = true
             skip_requesting_account_id = true
+        }
+
+        terraform {
+          required_version = ">= 0.15"
+          required_providers {
+            aws = {
+              source  = "hashicorp/aws"
+              version = "~> 3.43.0"
+            }
+          }
         }
 
         module "foo" {

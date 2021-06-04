@@ -32,7 +32,7 @@ RUN yum update --quiet -y \
     sqlite-devel \
     && yum clean all --quiet -y
 
-COPY --from=hashicorp/terraform:0.13.4 /bin/terraform /usr/local/bin
+COPY --from=hashicorp/terraform:0.15.4 /bin/terraform /usr/local/bin
 
 # Install Python3.7.2 and pip modules
 RUN cd /usr/bin && \
