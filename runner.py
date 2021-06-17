@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import glob
+from distutils.dir_util import copy_tree
 from tf_assertion_helper import finder, get_value
 
 class Runner(object):
@@ -40,7 +41,16 @@ class Runner(object):
         files = glob.iglob(os.path.join(sys.path[0], "*.tf"))
         for file in files:
             if os.path.isfile(file):
+                print(file)
                 shutil.copy(file, "%s/mymodule" % (self.tmpdir))
+
+    def _copy_tf_folders(self):
+        src_folder = os.path.join(sys.path[0], "/modules")
+
+        try:
+            copy_tree(src_folder, "%s/mymodule" % (self.tmpdir))
+        except Exception:
+            print(f'Folder ${src_folder} does not exist. Skipping...')
 
     def run(self):
         self._mktmpdir()
